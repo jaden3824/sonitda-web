@@ -1,30 +1,10 @@
+import { SiteHeader } from "@/components/site-header";
 import { brand } from "@/config/brand";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <div>
-            <p className="text-2xl font-bold tracking-tight text-blue-600">
-              {brand.name}
-            </p>
-            <p className="text-xs text-slate-500">{brand.description}</p>
-          </div>
-
-          <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
-            <a href="#questions" className="hover:text-blue-600">
-              질문 둘러보기
-            </a>
-            <a href="#experts" className="hover:text-blue-600">
-              전문가
-            </a>
-            <button className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-              질문하기
-            </button>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader />
 
       <section className="mx-auto flex max-w-6xl flex-col items-center px-5 py-24 text-center">
         <span className="mb-5 rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
