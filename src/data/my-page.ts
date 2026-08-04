@@ -26,6 +26,7 @@ export type RepairRequest = {
 export const currentUser = {
   username: "cleaning_beginner",
   nickname: "청소초보",
+  email: "cleaning@example.com",
   profileImage: "/images/profiles/default-profile.png",
   memberType: "일반 사용자",
   joinedAt: "2026년 8월",

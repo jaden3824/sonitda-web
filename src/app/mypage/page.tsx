@@ -75,12 +75,12 @@ export default function MyPage() {
                 </span>
               </div>
 
-              <button
-                type="button"
-                className="mt-6 min-h-11 w-full rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              <Link
+                href="/mypage/profile"
+                className="mt-6 flex min-h-11 w-full items-center justify-center rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
                 프로필 수정
-              </button>
+              </Link>
             </section>
 
             <nav

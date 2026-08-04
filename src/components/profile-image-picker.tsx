@@ -8,6 +8,11 @@ import {
 } from "react";
 import { profileImageConfig } from "@/config/profile";
 
+type ProfileImageAction =
+  | "keep"
+  | "replace"
+  | "default";
+
 type ProfileImagePickerProps = {
   name?: string;
   initialSrc?: string;
@@ -18,7 +23,13 @@ export function ProfileImagePicker({
   initialSrc = profileImageConfig.defaultSrc,
 }: ProfileImagePickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [previewSrc, setPreviewSrc] = useState(initialSrc);
+
+  const [previewSrc, setPreviewSrc] =
+    useState(initialSrc);
+
+  const [imageAction, setImageAction] =
+    useState<ProfileImageAction>("keep");
+
   const [error, setError] = useState("");
 
   function handleImageChange(
@@ -32,15 +43,16 @@ export function ProfileImagePicker({
       return;
     }
 
-    if (
-      !profileImageConfig.acceptedTypes.includes(
-        file.type as
-          | "image/jpeg"
-          | "image/png"
-          | "image/webp",
-      )
-    ) {
-      setError("JPG, PNG, WEBP 형식의 사진만 등록할 수 있습니다.");
+    const isAllowedType =
+      profileImageConfig.acceptedTypes.some(
+        (type) => type === file.type,
+      );
+
+    if (!isAllowedType) {
+      setError(
+        "JPG, PNG, WEBP 형식의 사진만 등록할 수 있습니다.",
+      );
+
       event.target.value = "";
       return;
     }
@@ -56,11 +68,14 @@ export function ProfileImagePicker({
     reader.onload = () => {
       if (typeof reader.result === "string") {
         setPreviewSrc(reader.result);
+        setImageAction("replace");
       }
     };
 
     reader.onerror = () => {
-      setError("사진을 불러오는 중 오류가 발생했습니다.");
+      setError(
+        "사진을 불러오는 중 오류가 발생했습니다.",
+      );
     };
 
     reader.readAsDataURL(file);
@@ -68,6 +83,7 @@ export function ProfileImagePicker({
 
   function restoreDefaultImage() {
     setPreviewSrc(profileImageConfig.defaultSrc);
+    setImageAction("default");
     setError("");
 
     if (inputRef.current) {
@@ -75,48 +91,50 @@ export function ProfileImagePicker({
     }
   }
 
-  function openFilePicker() {
-    inputRef.current?.click();
-  }
-
   return (
     <div>
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-        <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
+      <input
+        type="hidden"
+        name={`${name}Action`}
+        value={imageAction}
+      />
+
+      <div className="flex items-center gap-5">
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
           <Image
             src={previewSrc}
             alt="프로필 사진 미리보기"
             fill
-            sizes="112px"
+            sizes="96px"
             unoptimized={previewSrc.startsWith("data:")}
             className="object-cover"
           />
         </div>
 
         <div>
-          <p className="font-bold text-slate-900">
+          <p className="text-sm font-bold text-slate-900">
             프로필 사진
           </p>
 
           <p className="mt-1 text-sm leading-6 text-slate-500">
-            사진을 등록하지 않으면 기본 프로필 사진이 적용됩니다.
+            JPG, PNG, WEBP · 최대 5MB
           </p>
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={openFilePicker}
-              className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+              onClick={() => inputRef.current?.click()}
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
-              사진 선택
+              사진 변경
             </button>
 
             <button
               type="button"
               onClick={restoreDefaultImage}
-              className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100"
             >
-              기본 사진 사용
+              기본 사진으로 복원
             </button>
           </div>
         </div>
@@ -139,10 +157,6 @@ export function ProfileImagePicker({
           {error}
         </p>
       )}
-
-      <p className="mt-3 text-xs text-slate-400">
-        JPG, PNG, WEBP · 최대 5MB
-      </p>
     </div>
   );
 }
