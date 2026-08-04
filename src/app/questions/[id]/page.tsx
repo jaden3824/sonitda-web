@@ -1,3 +1,4 @@
+import { SaveQuestionButton } from "@/components/save-question-button";
 import { RepairRequestButton } from "@/components/repair-request-button";
 import Image from "next/image";
 import Link from "next/link";
@@ -37,6 +38,17 @@ export default function QuestionDetailPage() {
           <span aria-hidden="true">/</span>
           <span>{question.category}</span>
         </nav>
+
+        <div className="mt-5 flex justify-end border-b border-slate-200 pb-5">
+          <SaveQuestionButton
+            id={questionDetail.id}
+            title={questionDetail.title}
+            category={questionDetail.category}
+            brand={questionDetail.brand}
+            model={questionDetail.model}
+          />
+        </div>
+
 
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="min-w-0">

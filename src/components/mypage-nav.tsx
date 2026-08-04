@@ -22,6 +22,7 @@ const menuItems = [
   },
   {
     label: "저장한 질문",
+    href: "/mypage/saved",
   },
   {
     label: "알림 설정",
