@@ -192,7 +192,16 @@ export default function QuestionDetailPage() {
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="font-bold">
-                              {comment.author.name}
+                              {comment.author.expertId ? (
+                                <Link
+                                  href={`/experts/${comment.author.expertId}`}
+                                  className="transition hover:text-blue-600 hover:underline"
+                                >
+                                  {comment.author.name}
+                                </Link>
+                              ) : (
+                                comment.author.name
+                              )}
                             </h3>
 
                             <span

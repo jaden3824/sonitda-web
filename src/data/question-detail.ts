@@ -10,6 +10,7 @@ export type QuestionComment = {
     name: string;
     role: ParticipantRole;
     profile: string;
+    expertId?: string;
     helpfulCount?: number;
   };
   content: string;
@@ -82,6 +83,7 @@ export const questionDetail: QuestionDetail = {
         name: "김도현",
         role: "사업자 인증 전문가",
         profile: "로봇청소기 수리 8년",
+        expertId: "kim-dohyeon",
         helpfulCount: 318,
       },
       content:
@@ -107,12 +109,13 @@ export const questionDetail: QuestionDetail = {
         name: "박정우",
         role: "개인 전문가",
         profile: "전자제품 수리 경력 11년",
+        expertId: "park-jeongwoo",
         helpfulCount: 204,
       },
       content:
         "충전이 시작되는 순간 전압이 떨어지는 증상일 수 있습니다. 어댑터나 충전독 전원부가 부하를 견디지 못하는 경우 이런 현상이 나타납니다. 안전을 위해 충전독을 직접 분해하지는 마세요.",
       createdAt: "7분 전",
-      canRequestRepair: true,
+      canRequestRepair: false,
     },
     {
       id: "comment-4",
@@ -120,6 +123,7 @@ export const questionDetail: QuestionDetail = {
         name: "김도현",
         role: "사업자 인증 전문가",
         profile: "로봇청소기 수리 8년",
+        expertId: "kim-dohyeon",
         helpfulCount: 318,
       },
       content:

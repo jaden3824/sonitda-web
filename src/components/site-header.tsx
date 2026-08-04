@@ -22,10 +22,6 @@ export function SiteHeader() {
             질문 둘러보기
           </Link>
 
-          <Link href="/experts" className="transition hover:text-blue-600">
-            전문가
-          </Link>
-
           <Link href="/login" className="transition hover:text-blue-600">
             로그인
           </Link>
