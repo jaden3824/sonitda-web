@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { RepairReviewForm } from "@/components/repair-review-form";
 import {
   type FormEvent,
   useEffect,
@@ -429,6 +430,14 @@ export function RepairConsultation({
           </form>
         )}
       </section>
+
+      {request.status === "수리 완료" && (
+        <RepairReviewForm
+          questionId={request.questionId}
+          expertId={request.expertId}
+          expertName={request.expertName}
+        />
+      )}
 
       <div className="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-between">
         <Link

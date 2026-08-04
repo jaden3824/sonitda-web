@@ -181,6 +181,10 @@ export function removeBrowserRepairRequest(
   window.localStorage.removeItem(
     getRepairMessageStorageKey(questionId),
   );
+
+  window.localStorage.removeItem(
+    `sonitda:repair-review:${questionId}`,
+  );
 }
 
 export function readRepairMessages(
@@ -220,5 +224,105 @@ export function saveRepairMessages(
   window.localStorage.setItem(
     getRepairMessageStorageKey(questionId),
     JSON.stringify(messages),
+  );
+}
+
+export type RepairReviewRating =
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5;
+
+export type RepairReview = {
+  questionId: string;
+  expertId: string;
+  expertName: string;
+  rating: RepairReviewRating;
+  tags: string[];
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+const repairReviewPrefix =
+  "sonitda:repair-review:";
+
+function getRepairReviewStorageKey(
+  questionId: string,
+) {
+  return `${repairReviewPrefix}${questionId}`;
+}
+
+function isRepairReview(
+  value: unknown,
+): value is RepairReview {
+  if (!isObject(value)) {
+    return false;
+  }
+
+  return (
+    typeof value.questionId === "string" &&
+    typeof value.expertId === "string" &&
+    typeof value.expertName === "string" &&
+    typeof value.rating === "number" &&
+    value.rating >= 1 &&
+    value.rating <= 5 &&
+    Number.isInteger(value.rating) &&
+    Array.isArray(value.tags) &&
+    value.tags.every(
+      (tag) => typeof tag === "string",
+    ) &&
+    typeof value.body === "string" &&
+    typeof value.createdAt === "string" &&
+    typeof value.updatedAt === "string"
+  );
+}
+
+export function readRepairReview(
+  questionId: string,
+): RepairReview | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const value = window.localStorage.getItem(
+    getRepairReviewStorageKey(questionId),
+  );
+
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const parsedValue: unknown =
+      JSON.parse(value);
+
+    if (!isRepairReview(parsedValue)) {
+      return null;
+    }
+
+    return parsedValue;
+  } catch {
+    return null;
+  }
+}
+
+export function saveRepairReview(
+  review: RepairReview,
+) {
+  window.localStorage.setItem(
+    getRepairReviewStorageKey(
+      review.questionId,
+    ),
+    JSON.stringify(review),
+  );
+}
+
+export function removeRepairReview(
+  questionId: string,
+) {
+  window.localStorage.removeItem(
+    getRepairReviewStorageKey(questionId),
   );
 }

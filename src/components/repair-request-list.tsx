@@ -13,6 +13,7 @@ import {
 import {
   getRepairRequestStorageKey,
   readAllBrowserRepairRequests,
+  readRepairReview,
   removeBrowserRepairRequest,
 } from "@/lib/repair-request-storage";
 
@@ -23,6 +24,7 @@ type FilterValue =
 type RepairRequestView = RepairRequest & {
   storageKey?: string;
   browserQuestionId?: string;
+  hasReview?: boolean;
 };
 
 const filters: FilterValue[] = [
@@ -85,6 +87,11 @@ function readBrowserRequests():
         ),
       browserQuestionId:
         request.questionId,
+      hasReview: Boolean(
+        readRepairReview(
+          request.questionId,
+        ),
+      ),
     }),
   );
 }
@@ -299,15 +306,23 @@ export function RepairRequestList() {
                     </p>
                   </div>
 
-                  <span
-                    className={`w-fit shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${
-                      statusStyles[
-                        request.status
-                      ]
-                    }`}
-                  >
-                    {request.status}
-                  </span>
+                  <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+                    <span
+                      className={`w-fit rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${
+                        statusStyles[
+                          request.status
+                        ]
+                      }`}
+                    >
+                      {request.status}
+                    </span>
+
+                    {request.hasReview && (
+                      <span className="text-xs font-semibold text-emerald-700">
+                        후기 작성 완료
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-4 border-t border-slate-100 pt-4">
@@ -328,7 +343,9 @@ export function RepairRequestList() {
                     >
                       {request.status ===
                       "수리 완료"
-                        ? "완료 내용 확인"
+                        ? request.hasReview
+                          ? "후기 확인"
+                          : "후기 작성"
                         : "상담 내용 확인"}
                     </Link>
                   ) : request.status ===
