@@ -4,10 +4,10 @@ import { brand } from "@/config/brand";
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5">
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-7 px-5">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2"
+          className="flex shrink-0 items-center gap-2.5"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm font-black text-white">
             손
@@ -32,7 +32,7 @@ export function SiteHeader() {
             href="/questions"
             className="hover:text-blue-700"
           >
-            커뮤니티
+            질문 둘러보기
           </Link>
 
           <Link
@@ -58,7 +58,7 @@ export function SiteHeader() {
             htmlFor="header-search"
             className="sr-only"
           >
-            커뮤니티 검색
+            제품과 증상 검색
           </label>
 
           <input
@@ -77,10 +77,17 @@ export function SiteHeader() {
           </button>
         </form>
 
-        <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
+        <div className="ml-auto flex shrink-0 items-center gap-1 lg:ml-0">
+          <Link
+            href="/mypage"
+            className="hidden min-h-10 items-center px-3 text-sm font-semibold text-slate-600 hover:text-blue-700 sm:flex"
+          >
+            마이페이지
+          </Link>
+
           <Link
             href="/login"
-            className="hidden min-h-10 items-center px-3 text-sm font-semibold text-slate-600 hover:text-slate-950 sm:flex"
+            className="hidden min-h-10 items-center px-3 text-sm font-semibold text-slate-600 hover:text-blue-700 md:flex"
           >
             로그인
           </Link>
