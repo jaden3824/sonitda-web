@@ -1,272 +1,228 @@
-"use client";
-
+import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
 import {
   communityPosts,
   type CommunityPost,
 } from "@/data/home-community";
 
-type FeedMode =
-  | "최신"
-  | "활발"
-  | "답변 대기"
-  | "해결";
-
-const modes: FeedMode[] = [
-  "최신",
-  "활발",
-  "답변 대기",
-  "해결",
-];
-
-function getPosts(mode: FeedMode) {
-  const posts = [...communityPosts];
-
-  if (mode === "활발") {
-    return posts.sort(
-      (first, second) =>
-        second.commentCount +
-        second.helpfulCount -
-        (first.commentCount +
-          first.helpfulCount),
-    );
+function StatusBadge({
+  post,
+}: {
+  post: CommunityPost;
+}) {
+  if (!post.status) {
+    return null;
   }
 
-  if (mode === "답변 대기") {
-    return posts.filter(
-      (post) =>
-        post.type === "질문" &&
-        post.status === "답변 대기",
-    );
-  }
+  const style =
+    post.status === "해결 완료"
+      ? "bg-emerald-50 text-emerald-700"
+      : post.status === "답변 대기"
+        ? "bg-amber-50 text-amber-700"
+        : "bg-blue-50 text-blue-700";
 
-  if (mode === "해결") {
-    return posts.filter(
-      (post) =>
-        post.status === "해결 완료",
-    );
-  }
-
-  return posts;
+  return (
+    <span
+      className={`rounded-md px-2 py-1 text-xs font-semibold ${style}`}
+    >
+      {post.status}
+    </span>
+  );
 }
 
-function PostMetrics({
+function PostMeta({
   post,
 }: {
   post: CommunityPost;
 }) {
   return (
-    <div className="hidden w-20 shrink-0 text-center sm:block">
-      <p className="text-sm font-bold text-slate-800">
-        {post.commentCount}
-      </p>
-      <p className="mt-0.5 text-xs text-slate-400">
-        답변
-      </p>
-
-      <p className="mt-3 text-sm font-semibold text-slate-600">
-        {post.viewCount.toLocaleString()}
-      </p>
-      <p className="mt-0.5 text-xs text-slate-400">
-        조회
-      </p>
-    </div>
+    <p className="text-xs text-slate-400">
+      {post.author}
+      <span className="mx-1.5">·</span>
+      {post.createdAt}
+      <span className="mx-1.5">·</span>
+      답변 {post.commentCount}
+      <span className="mx-1.5">·</span>
+      조회 {post.viewCount.toLocaleString()}
+    </p>
   );
 }
 
 export function HomeCommunityFeed() {
-  const [mode, setMode] =
-    useState<FeedMode>("최신");
-
-  const posts = useMemo(
-    () => getPosts(mode),
-    [mode],
-  );
+  const featuredPost = communityPosts[0];
+  const secondaryPosts = communityPosts.slice(1, 3);
+  const latestPosts = communityPosts.slice(3, 9);
 
   return (
-    <section aria-labelledby="feed-heading">
-      <header className="flex flex-col gap-4 border-b-2 border-slate-900 pb-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1
-            id="feed-heading"
-            className="text-2xl font-black tracking-tight"
+    <div className="space-y-11">
+      <section aria-labelledby="featured-heading">
+        <div className="flex items-end justify-between border-b border-slate-200 pb-4">
+          <div>
+            <p className="text-sm font-bold text-blue-700">
+              지금 많이 보는 글
+            </p>
+
+            <h2
+              id="featured-heading"
+              className="mt-1 text-2xl font-black tracking-tight text-slate-950"
+            >
+              커뮤니티 주요 글
+            </h2>
+          </div>
+
+          <Link
+            href="/questions"
+            className="text-sm font-semibold text-slate-500 hover:text-blue-700"
           >
-            커뮤니티
-          </h1>
-
-          <p className="mt-1 text-sm text-slate-500">
-            고장 질문, 해결 경험과 관리 방법을
-            함께 나눕니다.
-          </p>
+            전체 보기
+          </Link>
         </div>
 
-        <Link
-          href="/questions/new"
-          className="text-sm font-bold text-blue-700 hover:underline"
-        >
-          새 질문 작성
-        </Link>
-      </header>
-
-      <div className="flex items-center justify-between border-b border-slate-300">
-        <div
-          role="tablist"
-          aria-label="글 정렬"
-          className="flex overflow-x-auto"
-        >
-          {modes.map((item) => (
-            <button
-              key={item}
-              type="button"
-              role="tab"
-              aria-selected={mode === item}
-              onClick={() => setMode(item)}
-              className={`min-h-12 shrink-0 border-b-2 px-4 text-sm font-semibold ${
-                mode === item
-                  ? "border-blue-600 text-blue-700"
-                  : "border-transparent text-slate-500 hover:text-slate-900"
-              }`}
+        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(260px,0.75fr)]">
+          <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <Link
+              href={featuredPost.href}
+              className="block"
             >
-              {item}
-            </button>
-          ))}
-        </div>
+              <div className="relative aspect-[16/7] overflow-hidden bg-slate-100">
+                <Image
+                  src="/images/questions/roborock-s8-charging-1.jpg"
+                  alt="충전독 앞에 놓인 로봇청소기"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 700px"
+                  className="object-cover"
+                />
+              </div>
 
-        <span className="hidden text-xs text-slate-400 sm:block">
-          {posts.length}개 글
-        </span>
-      </div>
-
-      {posts.length > 0 ? (
-        <div className="divide-y divide-slate-200 border-b border-slate-300">
-          {posts.map((post) => (
-            <article
-              key={post.id}
-              className="flex gap-4 py-5"
-            >
-              <PostMetrics post={post} />
-
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-                  <Link
-                    href={`/questions?category=${encodeURIComponent(
-                      post.category,
-                    )}`}
-                    className="font-bold text-blue-700"
-                  >
-                    {post.category}
-                  </Link>
-
-                  <span className="text-slate-300">
-                    /
+              <div className="p-6">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-bold text-blue-700">
+                    {featuredPost.category}
                   </span>
 
-                  <span className="text-slate-500">
-                    {post.type}
-                  </span>
-
-                  {post.status && (
-                    <>
-                      <span className="text-slate-300">
-                        /
-                      </span>
-
-                      <span
-                        className={
-                          post.status ===
-                          "해결 완료"
-                            ? "font-semibold text-emerald-700"
-                            : post.status ===
-                                "답변 대기"
-                              ? "font-semibold text-amber-700"
-                              : "font-semibold text-slate-500"
-                        }
-                      >
-                        {post.status}
-                      </span>
-                    </>
-                  )}
+                  <StatusBadge post={featuredPost} />
                 </div>
 
-                <h2 className="mt-2 text-base font-bold leading-6 text-slate-950 sm:text-lg">
+                <h3 className="mt-3 text-xl font-black leading-8 text-slate-950 hover:text-blue-700">
+                  {featuredPost.title}
+                </h3>
+
+                <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">
+                  {featuredPost.excerpt}
+                </p>
+
+                <div className="mt-5">
+                  <PostMeta post={featuredPost} />
+                </div>
+              </div>
+            </Link>
+          </article>
+
+          <div className="grid gap-4">
+            {secondaryPosts.map((post) => (
+              <article
+                key={post.id}
+                className="rounded-2xl border border-slate-200 bg-white p-5"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-bold text-blue-700">
+                    {post.category}
+                  </span>
+
+                  <StatusBadge post={post} />
+                </div>
+
+                <h3 className="mt-3 text-base font-bold leading-6 text-slate-950">
                   <Link
                     href={post.href}
-                    className="hover:text-blue-700 hover:underline"
+                    className="hover:text-blue-700"
                   >
-                    {post.hasAcceptedAnswer && (
-                      <span className="mr-2 text-emerald-600">
-                        ✓
-                      </span>
-                    )}
                     {post.title}
                   </Link>
-                </h2>
+                </h3>
 
-                <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">
+                <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">
                   {post.excerpt}
                 </p>
 
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {post.tags.map((tag) => (
-                    <Link
-                      key={tag}
-                      href={`/questions?query=${encodeURIComponent(
-                        tag,
-                      )}`}
-                      className="bg-slate-100 px-2 py-1 text-xs text-slate-500 hover:bg-slate-200"
-                    >
-                      {tag}
-                    </Link>
-                  ))}
+                <div className="mt-4">
+                  <PostMeta post={post} />
                 </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                <footer className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
-                  <span>
-                    {post.author}
-                  </span>
+      <section aria-labelledby="latest-heading">
+        <div className="flex items-end justify-between border-b border-slate-200 pb-4">
+          <div>
+            <p className="text-sm font-bold text-slate-500">
+              최근 활동
+            </p>
 
-                  <span>
-                    {post.authorRole}
-                  </span>
+            <h2
+              id="latest-heading"
+              className="mt-1 text-2xl font-black tracking-tight text-slate-950"
+            >
+              최신 커뮤니티 글
+            </h2>
+          </div>
 
-                  <span>
-                    {post.createdAt}
-                  </span>
+          <Link
+            href="/questions"
+            className="text-sm font-semibold text-slate-500 hover:text-blue-700"
+          >
+            더 보기
+          </Link>
+        </div>
 
-                  <span className="sm:hidden">
-                    답변 {post.commentCount}
-                  </span>
+        <div className="divide-y divide-slate-200">
+          {latestPosts.map((post) => (
+            <article
+              key={post.id}
+              className="grid gap-3 py-5 sm:grid-cols-[110px_minmax(0,1fr)_120px] sm:items-center"
+            >
+              <div className="flex items-center gap-2 sm:block">
+                <p className="text-xs font-bold text-blue-700">
+                  {post.category}
+                </p>
 
-                  <span className="sm:hidden">
-                    조회{" "}
-                    {post.viewCount.toLocaleString()}
-                  </span>
+                <div className="mt-0 sm:mt-2">
+                  <StatusBadge post={post} />
+                </div>
+              </div>
 
-                  <span>
-                    도움됨 {post.helpfulCount}
-                  </span>
-                </footer>
+              <div className="min-w-0">
+                <h3 className="truncate text-base font-bold text-slate-900">
+                  <Link
+                    href={post.href}
+                    className="hover:text-blue-700"
+                  >
+                    {post.title}
+                  </Link>
+                </h3>
+
+                <p className="mt-2 text-xs text-slate-400 sm:hidden">
+                  {post.author} · {post.createdAt} · 답변{" "}
+                  {post.commentCount}
+                </p>
+              </div>
+
+              <div className="hidden text-right sm:block">
+                <p className="text-xs text-slate-400">
+                  {post.createdAt}
+                </p>
+
+                <p className="mt-1 text-xs text-slate-500">
+                  답변 {post.commentCount} · 조회{" "}
+                  {post.viewCount.toLocaleString()}
+                </p>
               </div>
             </article>
           ))}
         </div>
-      ) : (
-        <div className="border-b border-slate-300 py-16 text-center">
-          <p className="font-bold">
-            해당 조건의 글이 없습니다
-          </p>
-        </div>
-      )}
-
-      <div className="mt-6 text-center">
-        <Link
-          href="/questions"
-          className="inline-flex min-h-11 items-center border border-slate-400 bg-white px-6 text-sm font-bold text-slate-700 hover:bg-slate-50"
-        >
-          커뮤니티 글 더 보기
-        </Link>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
