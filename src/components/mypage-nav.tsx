@@ -18,6 +18,7 @@ const menuItems = [
   },
   {
     label: "수리 요청",
+    href: "/mypage/repairs",
   },
   {
     label: "저장한 질문",

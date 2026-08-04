@@ -146,7 +146,9 @@ export default function MyPage() {
                         </p>
 
                         <h3 className="mt-1 font-bold">
-                          {request.expertName} 전문가
+                          {request.expertName
+                            ? `${request.expertName} 전문가`
+                            : "전문가 선택 전"}
                         </h3>
                       </div>
 
