@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import {
@@ -112,6 +113,37 @@ export default function QuestionDetailPage() {
                   ))}
                 </ul>
               </section>
+
+              {question.images.length > 0 && (
+                <section className="mt-8">
+                  <h2 className="text-sm font-bold text-slate-900">
+                    첨부 사진
+                  </h2>
+
+                  <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                    {question.images.map((image) => (
+                      <figure
+                        key={image.src}
+                        className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50"
+                      >
+                        <div className="relative aspect-[4/3] bg-slate-100">
+                          <Image
+                            src={image.src}
+                            alt={image.alt}
+                            fill
+                            sizes="(max-width: 640px) 100vw, 380px"
+                            className="object-cover"
+                          />
+                        </div>
+
+                        <figcaption className="px-4 py-3 text-sm leading-6 text-slate-600">
+                          {image.caption}
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <div className="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
                 감전이나 화재 위험이 있는 제품은 직접 분해하지 마세요.

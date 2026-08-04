@@ -28,6 +28,11 @@ export type QuestionDetail = {
   symptom: string;
   description: string;
   attemptedActions: string[];
+  images: {
+    src: string;
+    alt: string;
+    caption: string;
+  }[];
   status: "답변 대기" | "진단 중" | "해결 완료";
   createdAt: string;
   viewCount: number;
@@ -51,6 +56,18 @@ export const questionDetail: QuestionDetail = {
     "충전독 전원 케이블을 뽑았다가 다시 연결했습니다.",
     "청소기와 충전독의 충전 단자를 마른 천으로 닦았습니다.",
     "다른 콘센트에도 연결해 봤지만 증상이 같습니다.",
+  ],
+  images: [
+    {
+      src: "/images/questions/roborock-s8-charging-1.jpg",
+      alt: "충전독과 로봇청소기의 상태",
+      caption: "충전독에 올려놓은 로봇청소기 상태",
+    },
+    {
+      src: "/images/questions/roborock-s8-charging-2.jpg",
+      alt: "충전 어댑터와 전원 연결 상태",
+      caption: "충전 어댑터와 전원 케이블 연결 상태",
+    },
   ],
   status: "진단 중",
   createdAt: "18분 전",
