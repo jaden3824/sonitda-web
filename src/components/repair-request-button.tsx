@@ -6,63 +6,46 @@ import {
   useState,
 } from "react";
 import { questionDetail } from "@/data/question-detail";
+import {
+  type BrowserRepairRequest,
+  readBrowserRepairRequest,
+  saveBrowserRepairRequest,
+} from "@/lib/repair-request-storage";
 
 type RepairRequestButtonProps = {
   expertId: string;
   expertName: string;
 };
 
-type StoredRepairRequest = {
-  questionId: string;
-  questionTitle: string;
-  product: string;
-  expertId: string;
-  expertName: string;
-  reason: string;
-  status: "수리 상담 중";
-  createdAt: string;
-};
-
 export function RepairRequestButton({
   expertId,
   expertName,
 }: RepairRequestButtonProps) {
-  const storageKey =
-    `sonitda:active-repair:${questionDetail.id}`;
-
   const [isOpen, setIsOpen] = useState(false);
   const [reason, setReason] = useState("");
-  const [isAgreed, setIsAgreed] = useState(false);
+  const [isAgreed, setIsAgreed] =
+    useState(false);
   const [error, setError] = useState("");
   const [isSubmitted, setIsSubmitted] =
     useState(false);
 
-  const [existingRequest, setExistingRequest] =
-    useState<StoredRepairRequest | null>(null);
-
-  function readExistingRequest() {
-    const savedRequest =
-      window.localStorage.getItem(storageKey);
-
-    if (!savedRequest) {
-      setExistingRequest(null);
-      return;
-    }
-
-    try {
-      setExistingRequest(
-        JSON.parse(savedRequest) as StoredRepairRequest,
-      );
-    } catch {
-      window.localStorage.removeItem(storageKey);
-      setExistingRequest(null);
-    }
-  }
+  const [
+    existingRequest,
+    setExistingRequest,
+  ] = useState<BrowserRepairRequest | null>(
+    null,
+  );
 
   function openRequestDialog() {
     setError("");
     setIsSubmitted(false);
-    readExistingRequest();
+
+    setExistingRequest(
+      readBrowserRepairRequest(
+        questionDetail.id,
+      ),
+    );
+
     setIsOpen(true);
   }
 
@@ -77,9 +60,15 @@ export function RepairRequestButton({
     event.preventDefault();
     setError("");
 
-    if (existingRequest) {
+    const savedRequest =
+      readBrowserRepairRequest(
+        questionDetail.id,
+      );
+
+    if (savedRequest) {
+      setExistingRequest(savedRequest);
       setError(
-        "이 질문에는 이미 진행 중인 수리 요청이 있습니다.",
+        "이 질문에는 이미 수리 요청 내역이 있습니다.",
       );
       return;
     }
@@ -98,22 +87,20 @@ export function RepairRequestButton({
       return;
     }
 
-    const repairRequest: StoredRepairRequest = {
-      questionId: questionDetail.id,
-      questionTitle: questionDetail.title,
-      product:
-        `${questionDetail.brand} · ${questionDetail.model}`,
-      expertId,
-      expertName,
-      reason: reason.trim(),
-      status: "수리 상담 중",
-      createdAt: new Date().toISOString(),
-    };
+    const repairRequest: BrowserRepairRequest =
+      {
+        questionId: questionDetail.id,
+        questionTitle: questionDetail.title,
+        product:
+          `${questionDetail.brand} · ${questionDetail.model}`,
+        expertId,
+        expertName,
+        reason: reason.trim(),
+        status: "수리 상담 중",
+        createdAt: new Date().toISOString(),
+      };
 
-    window.localStorage.setItem(
-      storageKey,
-      JSON.stringify(repairRequest),
-    );
+    saveBrowserRepairRequest(repairRequest);
 
     setExistingRequest(repairRequest);
     setIsSubmitted(true);
@@ -134,7 +121,9 @@ export function RepairRequestButton({
           role="presentation"
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-6"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
+            if (
+              event.target === event.currentTarget
+            ) {
               closeRequestDialog();
             }
           }}
@@ -180,15 +169,15 @@ export function RepairRequestButton({
                   </h3>
 
                   <p className="mt-2 text-sm leading-6 text-emerald-800">
-                    전문가가 요청 내용을 확인한 뒤 상담 가능
-                    여부와 진행 방법을 안내합니다.
+                    상담 화면에서 추가 내용을
+                    전달하거나 진행 상태를 확인할 수
+                    있습니다.
                   </p>
                 </div>
 
                 <p className="mt-5 text-sm leading-6 text-slate-500">
-                  현재는 기능 확인용으로 이 브라우저에만
-                  저장됩니다. 실제 서버 저장과 알림 전송은
-                  데이터베이스 연결 단계에서 구현합니다.
+                  현재는 기능 확인용으로 이
+                  브라우저에 저장됩니다.
                 </p>
 
                 <div className="mt-7 flex justify-end gap-3">
@@ -201,10 +190,10 @@ export function RepairRequestButton({
                   </button>
 
                   <Link
-                    href="/mypage/repairs"
+                    href={`/mypage/repairs/${questionDetail.id}`}
                     className="flex min-h-11 items-center bg-blue-600 px-5 text-sm font-semibold text-white hover:bg-blue-700"
                   >
-                    수리 요청 내역
+                    상담 화면 열기
                   </Link>
                 </div>
               </div>
@@ -215,12 +204,15 @@ export function RepairRequestButton({
                   className="border border-amber-200 bg-amber-50 p-5"
                 >
                   <h3 className="font-bold text-amber-900">
-                    이미 진행 중인 요청이 있습니다
+                    {existingRequest.status ===
+                    "수리 완료"
+                      ? "완료된 수리 요청이 있습니다"
+                      : "이미 진행 중인 요청이 있습니다"}
                   </h3>
 
                   <p className="mt-2 text-sm leading-6 text-amber-800">
-                    한 질문에는 한 명의 전문가에게만 수리를
-                    요청할 수 있습니다.
+                    한 질문에는 한 번에 하나의 수리
+                    요청만 등록할 수 있습니다.
                   </p>
                 </div>
 
@@ -229,6 +221,7 @@ export function RepairRequestButton({
                     <dt className="font-semibold text-slate-500">
                       요청 전문가
                     </dt>
+
                     <dd className="font-semibold text-slate-900">
                       {existingRequest.expertName}
                     </dd>
@@ -238,20 +231,28 @@ export function RepairRequestButton({
                     <dt className="font-semibold text-slate-500">
                       진행 상태
                     </dt>
+
                     <dd className="font-semibold text-blue-700">
                       {existingRequest.status}
                     </dd>
                   </div>
                 </dl>
 
-                <div className="mt-7 flex justify-end">
+                <div className="mt-7 flex justify-end gap-3">
                   <button
                     type="button"
                     onClick={closeRequestDialog}
-                    className="min-h-11 bg-slate-900 px-5 text-sm font-semibold text-white hover:bg-slate-800"
+                    className="min-h-11 border border-slate-300 px-5 text-sm font-semibold text-slate-700"
                   >
-                    확인
+                    닫기
                   </button>
+
+                  <Link
+                    href={`/mypage/repairs/${questionDetail.id}`}
+                    className="flex min-h-11 items-center bg-slate-900 px-5 text-sm font-semibold text-white hover:bg-slate-800"
+                  >
+                    요청 내용 확인
+                  </Link>
                 </div>
               </div>
             ) : (
@@ -262,6 +263,7 @@ export function RepairRequestButton({
                       <dt className="font-semibold text-slate-500">
                         제품
                       </dt>
+
                       <dd className="font-semibold text-slate-900">
                         {questionDetail.brand} ·{" "}
                         {questionDetail.model}
@@ -272,6 +274,7 @@ export function RepairRequestButton({
                       <dt className="font-semibold text-slate-500">
                         증상
                       </dt>
+
                       <dd className="leading-6 text-slate-800">
                         {questionDetail.title}
                       </dd>
@@ -281,6 +284,7 @@ export function RepairRequestButton({
                       <dt className="font-semibold text-slate-500">
                         전문가
                       </dt>
+
                       <dd className="font-semibold text-slate-900">
                         {expertName}
                       </dd>
@@ -296,15 +300,18 @@ export function RepairRequestButton({
                     </label>
 
                     <p className="mt-1 text-sm leading-6 text-slate-500">
-                      방문·택배 가능 여부, 추가 증상 등 전문가가
-                      확인해야 할 내용을 적어주세요.
+                      추가 증상과 제품 전달 방식 등
+                      전문가가 확인해야 할 내용을
+                      적어주세요.
                     </p>
 
                     <textarea
                       id={`repair-reason-${expertId}`}
                       value={reason}
                       onChange={(event) =>
-                        setReason(event.target.value)
+                        setReason(
+                          event.target.value,
+                        )
                       }
                       maxLength={500}
                       rows={5}
@@ -322,15 +329,17 @@ export function RepairRequestButton({
                       type="checkbox"
                       checked={isAgreed}
                       onChange={(event) =>
-                        setIsAgreed(event.target.checked)
+                        setIsAgreed(
+                          event.target.checked,
+                        )
                       }
                       className="mt-1 h-4 w-4"
                     />
 
                     <span className="text-sm leading-6 text-slate-600">
-                      수리 요청은 즉시 계약이나 결제를 의미하지
-                      않으며, 전문가와 점검 범위·비용·전달 방법을
-                      확인한 뒤 진행한다는 안내를 확인했습니다.
+                      전문가와 점검 범위·비용·전달
+                      방법을 확인한 뒤 수리를
+                      진행한다는 안내를 확인했습니다.
                     </span>
                   </label>
 
@@ -342,11 +351,6 @@ export function RepairRequestButton({
                       {error}
                     </p>
                   )}
-
-                  <p className="text-xs leading-5 text-slate-400">
-                    이 버튼은 공개 답변을 작성한 사업자 인증
-                    전문가에게만 표시됩니다.
-                  </p>
                 </div>
 
                 <footer className="flex justify-end gap-3 border-t border-slate-200 px-5 py-5 sm:px-7">
