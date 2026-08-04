@@ -1,243 +1,379 @@
 import Link from "next/link";
+import { HomeCommunityFeed } from "@/components/home-community-feed";
 import { SiteHeader } from "@/components/site-header";
 import { brand } from "@/config/brand";
 import {
   categories,
   recentCases,
-  type CasePreview,
 } from "@/data/demo";
+import {
+  communityStats,
+  popularTopics,
+  waitingQuestions,
+} from "@/data/home-community";
 
-const statusStyles: Record<CasePreview["status"], string> = {
-  "답변 대기": "bg-amber-50 text-amber-700 ring-amber-200",
-  "진단 중": "bg-blue-50 text-blue-700 ring-blue-200",
-  "해결 완료": "bg-emerald-50 text-emerald-700 ring-emerald-200",
-};
+const solvedCases = recentCases.filter(
+  (item) => item.status === "해결 완료",
+);
 
-function formatRepairCost(cost: number) {
-  if (cost === 0) {
-    return "비용 없이 해결";
-  }
-
-  return `${cost.toLocaleString("ko-KR")}원`;
-}
-
-export default function Home() {
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-white text-slate-900">
       <SiteHeader />
 
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col items-center px-5 py-20 text-center sm:py-24">
-          <span className="mb-5 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700">
-            사용자와 전문가가 함께 만드는 수리 커뮤니티
-          </span>
+      <section className="border-b border-slate-200 bg-slate-50">
+        <div className="mx-auto max-w-6xl px-5 py-14 sm:py-18">
+          <div className="max-w-3xl">
+            <p className="text-sm font-bold text-blue-700">
+              {brand.description}
+            </p>
 
-          <h1 className="max-w-3xl text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-            어떤 제품이 고장 났나요?
-          </h1>
+            <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">
+              고장 경험을 나누고,
+              <br />
+              함께 해결합니다
+            </h1>
 
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-            {brand.slogan}
-          </p>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+              제품 증상을 질문하고 사용자 경험과
+              전문가의 진단을 비교해 보세요. 필요한
+              경우 답변한 전문가에게 수리도 요청할 수
+              있습니다.
+            </p>
 
-          <form
-            action="/questions"
-            className="mt-10 flex w-full max-w-2xl flex-col gap-3 sm:flex-row"
-          >
-            <label htmlFor="home-search" className="sr-only">
-              제품명, 모델명 또는 증상 검색
-            </label>
-
-            <input
-              id="home-search"
-              name="query"
-              type="search"
-              placeholder="예: 로보락 S8 충전이 안 돼요"
-              className="min-h-14 flex-1 rounded-xl border border-slate-300 bg-white px-5 text-base outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-            />
-
-            <button
-              type="submit"
-              className="min-h-14 rounded-xl bg-blue-600 px-8 font-semibold text-white transition hover:bg-blue-700"
+            <form
+              action="/questions"
+              className="mt-8 flex max-w-2xl flex-col gap-2 sm:flex-row"
             >
-              검색
-            </button>
-          </form>
-
-          <Link
-            href="/questions/new"
-            className="mt-5 text-sm font-semibold text-blue-600 transition hover:text-blue-700"
-          >
-            찾는 내용이 없다면 질문을 등록하세요 →
-          </Link>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 py-16">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold text-blue-600">카테고리</p>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-              어떤 제품에 문제가 있나요?
-            </h2>
-          </div>
-
-          <Link
-            href="/questions"
-            className="hidden text-sm font-semibold text-slate-600 hover:text-blue-600 sm:block"
-          >
-            전체 질문 보기 →
-          </Link>
-        </div>
-
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              href={`/questions?category=${category.id}`}
-              className="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
-            >
-              <span
-                aria-hidden="true"
-                className="text-3xl"
+              <label
+                htmlFor="home-search"
+                className="sr-only"
               >
-                {category.icon}
-              </span>
+                제품 또는 고장 증상 검색
+              </label>
 
-              <h3 className="mt-4 font-bold text-slate-900 group-hover:text-blue-600">
-                {category.name}
-              </h3>
+              <input
+                id="home-search"
+                name="query"
+                type="search"
+                placeholder="예: 로봇청소기 충전 안 됨, 모니터 화면 깜빡임"
+                className="min-h-13 min-w-0 flex-1 border border-slate-400 bg-white px-4 text-sm outline-none placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+              />
 
-              <p className="mt-1 hidden text-sm leading-6 text-slate-500 sm:block">
-                {category.description}
-              </p>
-            </Link>
-          ))}
+              <button
+                type="submit"
+                className="min-h-13 bg-blue-600 px-6 text-sm font-bold text-white hover:bg-blue-700"
+              >
+                검색
+              </button>
+            </form>
+
+            <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+              <Link
+                href="/questions/new"
+                className="font-bold text-blue-700 hover:underline"
+              >
+                직접 질문하기
+              </Link>
+
+              <Link
+                href="/questions"
+                className="font-semibold text-slate-600 hover:text-slate-900"
+              >
+                최근 질문 둘러보기
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
       <section
-        id="questions"
-        className="border-y border-slate-200 bg-white"
+        aria-label="커뮤니티 현황"
+        className="border-b border-slate-200"
       >
-        <div className="mx-auto max-w-6xl px-5 py-16">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold text-blue-600">
-                최근 질문과 해결 사례
+        <div className="mx-auto grid max-w-6xl grid-cols-2 px-5 sm:grid-cols-4">
+          {communityStats.map(
+            (stat, index) => (
+              <div
+                key={stat.label}
+                className={`py-6 ${
+                  index % 2 === 0
+                    ? "border-r border-slate-200 pr-5"
+                    : "pl-5"
+                } ${
+                  index >= 2
+                    ? "border-t border-slate-200 sm:border-t-0"
+                    : ""
+                } sm:border-r sm:border-slate-200 sm:px-6 sm:first:pl-0 sm:last:border-r-0 sm:last:pr-0`}
+              >
+                <p className="text-2xl font-bold text-slate-950">
+                  {stat.value}
+                </p>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  {stat.label}
+                </p>
+              </div>
+            ),
+          )}
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-6xl px-5 py-12">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <HomeCommunityFeed />
+
+          <aside className="space-y-9">
+            <section>
+              <header className="border-b border-slate-300 pb-4">
+                <p className="text-sm font-semibold text-amber-700">
+                  답변 참여
+                </p>
+
+                <h2 className="mt-1 text-xl font-bold">
+                  답변을 기다리는 질문
+                </h2>
+              </header>
+
+              <div className="divide-y divide-slate-200">
+                {waitingQuestions.map(
+                  (question) => (
+                    <article
+                      key={question.id}
+                      className="py-4"
+                    >
+                      <p className="text-xs font-semibold text-slate-500">
+                        {question.category} ·{" "}
+                        {question.createdAt}
+                      </p>
+
+                      <h3 className="mt-2 text-sm font-bold leading-6">
+                        <Link
+                          href={question.href}
+                          className="hover:text-blue-700 hover:underline"
+                        >
+                          {question.title}
+                        </Link>
+                      </h3>
+                    </article>
+                  ),
+                )}
+              </div>
+
+              <Link
+                href="/questions?status=waiting"
+                className="mt-4 inline-flex text-sm font-semibold text-blue-700 hover:underline"
+              >
+                답변 대기 질문 더 보기 →
+              </Link>
+            </section>
+
+            <section>
+              <header className="border-b border-slate-300 pb-4">
+                <h2 className="text-xl font-bold">
+                  많이 찾는 주제
+                </h2>
+              </header>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {popularTopics.map((topic) => (
+                  <Link
+                    key={topic}
+                    href={`/questions?query=${encodeURIComponent(
+                      topic,
+                    )}`}
+                    className="border border-slate-300 bg-white px-3 py-2 text-sm text-slate-600 hover:border-blue-500 hover:text-blue-700"
+                  >
+                    {topic}
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+            <section className="border border-slate-300 bg-slate-50 p-5">
+              <h2 className="font-bold">
+                고장 증상을 알고 계신가요?
+              </h2>
+
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                모델명과 증상을 구체적으로 적으면
+                비슷한 경험을 가진 사용자와 전문가가
+                더 정확하게 답변할 수 있습니다.
               </p>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-                실제 대화를 확인해 보세요
+
+              <Link
+                href="/questions/new"
+                className="mt-5 flex min-h-11 items-center justify-center bg-slate-900 px-4 text-sm font-bold text-white hover:bg-slate-800"
+              >
+                질문 작성
+              </Link>
+            </section>
+          </aside>
+        </div>
+      </div>
+
+      <section className="border-y border-slate-200 bg-slate-50">
+        <div className="mx-auto max-w-6xl px-5 py-12">
+          <header className="flex flex-col gap-3 border-b border-slate-300 pb-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-blue-700">
+                분야별 탐색
+              </p>
+
+              <h2 className="mt-1 text-2xl font-bold">
+                제품 카테고리
               </h2>
             </div>
 
-            <Link
-              href="/questions"
-              className="text-sm font-semibold text-slate-600 hover:text-blue-600"
-            >
-              모두 보기 →
-            </Link>
-          </div>
+            <p className="text-sm text-slate-500">
+              모델을 몰라도 제품 종류부터 찾아볼 수
+              있습니다.
+            </p>
+          </header>
 
-          <div className="mt-8 divide-y divide-slate-200 border-y border-slate-200">
-            {recentCases.map((item) => (
-              <article
-                key={item.id}
-                className="py-6 first:pt-0 last:pb-0"
+          <div className="mt-6 grid border-l border-t border-slate-300 sm:grid-cols-2 lg:grid-cols-4">
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/questions?category=${category.id}`}
+                className="min-h-36 border-b border-r border-slate-300 bg-white p-5 hover:bg-blue-50"
               >
-                <Link
-                  href={`/questions/${item.id}`}
-                  className="group block"
+                <span
+                  aria-hidden="true"
+                  className="text-2xl"
                 >
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-                        <span>{item.category}</span>
-                        <span aria-hidden="true">·</span>
-                        <span>{item.brand}</span>
-                        <span aria-hidden="true">·</span>
-                        <span className="font-medium text-slate-700">
-                          {item.model}
-                        </span>
-                      </div>
+                  {category.icon}
+                </span>
 
-                      <h3 className="mt-2 text-lg font-bold leading-7 text-slate-900 transition group-hover:text-blue-600">
-                        {item.title}
-                      </h3>
+                <h3 className="mt-4 font-bold">
+                  {category.name}
+                </h3>
 
-                      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500">
-                        <span>댓글 {item.commentCount}</span>
-                        <span>전문가 의견 {item.expertCount}</span>
-                        <span>{item.createdAt}</span>
-                      </div>
-
-                      {item.resolution && (
-                        <div className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                          <span className="font-semibold">해결 결과</span>
-                          <span className="mx-2 text-emerald-300">|</span>
-                          {item.resolution}
-
-                          {typeof item.repairCost === "number" && (
-                            <>
-                              <span className="mx-2 text-emerald-300">·</span>
-                              {formatRepairCost(item.repairCost)}
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <span
-                      className={`w-fit shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${
-                        statusStyles[item.status]
-                      }`}
-                    >
-                      {item.status}
-                    </span>
-                  </div>
-                </Link>
-              </article>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  {category.description}
+                </p>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-16">
-        <div className="rounded-3xl bg-slate-900 px-6 py-10 text-white sm:px-10 sm:py-12">
-          <p className="text-sm font-semibold text-blue-300">
-            손잇다는 이렇게 작동합니다
-          </p>
+      <section className="mx-auto max-w-6xl px-5 py-12">
+        <header className="flex flex-col gap-3 border-b border-slate-300 pb-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-emerald-700">
+              해결 사례
+            </p>
 
-          <h2 className="mt-3 max-w-2xl text-2xl font-bold tracking-tight sm:text-3xl">
-            질문부터 해결 결과까지 하나의 기록으로 남깁니다
-          </h2>
+            <h2 className="mt-1 text-2xl font-bold">
+              커뮤니티에서 해결된 문제
+            </h2>
+          </div>
 
-          <div className="mt-9 grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              ["01", "모델명으로 질문", "제품과 모델을 지정하고 증상을 올립니다."],
-              ["02", "공개 대화", "사용자와 전문가가 댓글로 원인을 좁힙니다."],
-              ["03", "전문가 선택", "답변 내용을 보고 믿을 수 있는 전문가를 선택합니다."],
-              ["04", "해결 기록", "실제 원인과 수리 결과가 다음 사용자를 위해 남습니다."],
-            ].map(([number, title, description]) => (
-              <div key={number}>
-                <span className="text-sm font-bold text-blue-300">
-                  {number}
-                </span>
-                <h3 className="mt-3 font-bold">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-300">
-                  {description}
+          <Link
+            href="/questions?status=solved"
+            className="text-sm font-semibold text-slate-600 hover:text-blue-700"
+          >
+            해결된 질문 더 보기 →
+          </Link>
+        </header>
+
+        <div className="divide-y divide-slate-200 border-b border-slate-300">
+          {solvedCases.map((item) => (
+            <article
+              key={item.id}
+              className="grid gap-4 py-6 md:grid-cols-[minmax(0,1fr)_220px]"
+            >
+              <div>
+                <p className="text-sm text-slate-500">
+                  {item.category} · {item.brand} ·{" "}
+                  {item.model}
+                </p>
+
+                <h3 className="mt-2 text-lg font-bold leading-7">
+                  <Link
+                    href={`/questions?query=${encodeURIComponent(
+                      item.title,
+                    )}`}
+                    className="hover:text-blue-700 hover:underline"
+                  >
+                    {item.title}
+                  </Link>
+                </h3>
+
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  해결 방법:{" "}
+                  <strong className="font-semibold text-slate-800">
+                    {item.resolution}
+                  </strong>
                 </p>
               </div>
-            ))}
+
+              <dl className="grid grid-cols-2 gap-4 border-t border-slate-200 pt-4 text-sm md:border-l md:border-t-0 md:pl-6 md:pt-0">
+                <div>
+                  <dt className="text-slate-400">
+                    참여 전문가
+                  </dt>
+
+                  <dd className="mt-1 font-bold">
+                    {item.expertCount}명
+                  </dd>
+                </div>
+
+                <div>
+                  <dt className="text-slate-400">
+                    수리 비용
+                  </dt>
+
+                  <dd className="mt-1 font-bold">
+                    {item.repairCost === 0
+                      ? "자가 해결"
+                      : item.repairCost
+                        ? `${item.repairCost.toLocaleString()}원`
+                        : "미공개"}
+                  </dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-t border-slate-200 bg-slate-950 text-white">
+        <div className="mx-auto max-w-6xl px-5 py-10">
+          <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <h2 className="text-2xl font-bold">
+                혼자 판단하기 어려운 고장,
+                먼저 질문해 보세요
+              </h2>
+
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                답변을 확인한 뒤 필요한 경우에만
+                사업자 인증 전문가에게 수리를 요청할 수
+                있습니다.
+              </p>
+            </div>
+
+            <Link
+              href="/questions/new"
+              className="flex min-h-12 items-center justify-center bg-white px-6 text-sm font-bold text-slate-950 hover:bg-slate-100"
+            >
+              질문 등록하기
+            </Link>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-semibold text-slate-700">
-            {brand.name} · {brand.description}
+      <footer className="border-t border-slate-800 bg-slate-950 text-slate-400">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            <strong className="text-white">
+              {brand.name}
+            </strong>{" "}
+            · {brand.description}
           </p>
+
           <p>{brand.shortSlogan}</p>
         </div>
       </footer>
