@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { MyPageNav } from "@/components/mypage-nav";
 import { SiteHeader } from "@/components/site-header";
 import {
   currentUser,
@@ -83,31 +84,7 @@ export default function MyPage() {
               </Link>
             </section>
 
-            <nav
-              aria-label="마이페이지 메뉴"
-              className="rounded-2xl border border-slate-200 bg-white p-3"
-            >
-              {[
-                "내 활동",
-                "내 질문",
-                "수리 요청",
-                "저장한 질문",
-                "알림 설정",
-                "계정 설정",
-              ].map((menu, index) => (
-                <button
-                  key={menu}
-                  type="button"
-                  className={`flex min-h-11 w-full items-center rounded-xl px-4 text-left text-sm font-semibold transition ${
-                    index === 0
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  {menu}
-                </button>
-              ))}
-            </nav>
+            <MyPageNav />
           </aside>
 
           <div className="min-w-0 space-y-7">
