@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import {
@@ -46,8 +47,14 @@ export default function MyPage() {
         <div className="mt-8 grid gap-7 lg:grid-cols-[280px_minmax(0,1fr)]">
           <aside className="space-y-5">
             <section className="rounded-2xl border border-slate-200 bg-white p-6">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 text-xl font-bold text-white">
-                {currentUser.nickname.slice(0, 1)}
+              <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+                <Image
+                  src={currentUser.profileImage}
+                  alt={`${currentUser.nickname} 프로필 사진`}
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
               </div>
 
               <h2 className="mt-4 text-xl font-bold">

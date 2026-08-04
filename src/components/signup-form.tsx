@@ -4,6 +4,7 @@ import {
   type FormEvent,
   useState,
 } from "react";
+import { ProfileImagePicker } from "@/components/profile-image-picker";
 
 type MemberType = "user" | "expert";
 
@@ -124,6 +125,20 @@ export function SignupForm() {
             </label>
           </div>
         </fieldset>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <h2 className="text-lg font-bold">
+          프로필 사진
+        </h2>
+
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          가입 후 마이페이지에서도 언제든지 변경할 수 있습니다.
+        </p>
+
+        <div className="mt-5">
+          <ProfileImagePicker />
+        </div>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
