@@ -1,3 +1,4 @@
+import { RepairRequestButton } from "@/components/repair-request-button";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
@@ -246,14 +247,13 @@ export default function QuestionDetailPage() {
                         답변하기
                       </button>
 
-                      {comment.canRequestRepair && (
-                        <button
-                          type="button"
-                          className="ml-auto rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100"
-                        >
-                          이 전문가에게 수리 요청
-                        </button>
-                      )}
+                      {comment.canRequestRepair &&
+                        comment.author.expertId && (
+                          <RepairRequestButton
+                            expertId={comment.author.expertId}
+                            expertName={comment.author.name}
+                          />
+                        )}
                     </div>
                   </article>
                 ))}
